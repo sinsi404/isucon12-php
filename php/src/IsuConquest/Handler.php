@@ -1051,13 +1051,14 @@ final class Handler
             throw new HttpInternalServerErrorException($request, $e->getMessage(), $e);
         }
         try {
-            $tID = $this->generateID();
+            // NOTE: generaterの利用をやめる
+            // $tID = $this->generateID();
             $tk = $this->generateUUID();
         } catch (Exception $e) {
             throw new HttpInternalServerErrorException($request, $e->getMessage(), $e);
         }
         $token = new UserOneTimeToken(
-            id: $tID,
+            id: null,
             userID: $userID,
             token: $tk,
             tokenType: 1,
@@ -1065,16 +1066,15 @@ final class Handler
             updatedAt: $requestAt,
             expiredAt: $requestAt + 600,
         );
-        $query = 'INSERT INTO user_one_time_tokens(id, user_id, token, token_type, created_at, updated_at, expired_at) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        $query = 'INSERT INTO user_one_time_tokens(user_id, token, token_type, created_at, updated_at, expired_at) VALUES (?, ?, ?, ?, ?, ?)';
         try {
             $stmt = $this->db->prepare($query);
-            $stmt->bindValue(1, $token->id, PDO::PARAM_INT);
-            $stmt->bindValue(2, $token->userID, PDO::PARAM_INT);
-            $stmt->bindValue(3, $token->token);
-            $stmt->bindValue(4, $token->tokenType, PDO::PARAM_INT);
-            $stmt->bindValue(5, $token->createdAt, PDO::PARAM_INT);
-            $stmt->bindValue(6, $token->updatedAt, PDO::PARAM_INT);
-            $stmt->bindValue(7, $token->expiredAt, PDO::PARAM_INT);
+            $stmt->bindValue(1, $token->userID, PDO::PARAM_INT);
+            $stmt->bindValue(2, $token->token);
+            $stmt->bindValue(3, $token->tokenType, PDO::PARAM_INT);
+            $stmt->bindValue(4, $token->createdAt, PDO::PARAM_INT);
+            $stmt->bindValue(5, $token->updatedAt, PDO::PARAM_INT);
+            $stmt->bindValue(6, $token->expiredAt, PDO::PARAM_INT);
             $stmt->execute();
         } catch (PDOException $e) {
             throw new HttpInternalServerErrorException($request, $e->getMessage(), $e);
@@ -1541,7 +1541,7 @@ final class Handler
             updatedAt: $requestAt,
             expiredAt: $requestAt + 600,
         );
-        $query = 'INSERT INTO user_one_time_tokens(user_id, token, token_type, created_at, updated_at, expired_at) VALUES (?, ?, ?, ?, ?, ?, ?)';
+        $query = 'INSERT INTO user_one_time_tokens(user_id, token, token_type, created_at, updated_at, expired_at) VALUES (?, ?, ?, ?, ?, ?)';
         try {
             $stmt = $this->db->prepare($query);
             $stmt->bindValue(1, $token->userID, PDO::PARAM_INT);
