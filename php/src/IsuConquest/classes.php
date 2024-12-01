@@ -956,7 +956,7 @@ class Session implements JsonSerializable
 class UserOneTimeToken
 {
     public function __construct(
-        public int $id,
+        public ?int $id,
         public int $userID,
         public string $token,
         public int $tokenType,
